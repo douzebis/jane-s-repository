@@ -25,12 +25,11 @@
             get: (searchParams, prop) => searchParams.get(prop),
         })
         console.log(params)  // TODO
-        console.log(coreluc(20))
-
-        const Pretty = params.pretty
-        const Ordinals = params.ordinals
-        const Width = params.n
-        const Height = params.n
+        const Flags = params.flags
+        const Pretty = Flags & 1
+        const Ordinals = (Flags & 6) >> 1
+        const Width = Flags >> 3
+        const Height = Flags >> 3
         const N = Width * Height
         console.log(N)  // TODO
         function nameEdge(i, j) {
