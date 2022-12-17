@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Network</title>
+    <script
+        type="text/javascript"
+        src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"
+    ></script>
+    <style type="text/css">
+        #mynetwork {
+            width: 600px;
+            height: 180px;
+            border: 0px solid lightgray;
+        }
+    </style>
+</head>
+<body>
+    <div id="mynetwork"></div>
+    <script type="text/javascript">
+        const params = new Proxy(new URLSearchParams(window.location.search), {
+            get: (searchParams, prop) => searchParams.get(prop),
+        })
+        console.log(params)  // TODO
+
+        const End = params.n
+        const N = End < 10 ? 10 : End
+        console.log(N)  // TODO
+        function nameEdge(i, j) {
+            return N*i + j
+        }
+
+        function giveI(n) {
+            return Math.trunc(n / nodesNB)
+        }
+
+        function giveJ(n) {
+            return n % nodesNB
+        }
+      
+        function HSLToHex(h, s, l) {
+            const hDecimal = l / 100
+            const a = (s * Math.min(hDecimal, 1 - hDecimal)) / 100
+            const f = (n) => {
+            const k = (n + h / 30) % 12
+            const color = hDecimal - a * Math.max(Math.min(k - 3, 9 - k, 1), -1)
+
+            // Convert to Hex and prefix with "0" if required
+            return Math.round(255 * color)
+                .toString(16)
+                .padStart(2, "0")
+            }
+            return `#${f(0)}${f(8)}${f(4)}`
+        }
+
+        function is_even(n) {
+            return n%2 == 0
+        }
+
+        function is_odd(n) {
+            return n%2 != 0
+        }
+
+        function is_black(n) {
+            return n%3 == 0
+        }
+
+        function is_white(n) {
+            return n%3 != 0
+        }
+
+        function label(n) {
+            return 1 + (n >> 1)
+        }
+
+        function up(n) {
+            return n + label(n)
+        }
+
+        function down(n) {
+            return n - label(n)
+        }
+
+        function lambda(n) {
+            if (is_black(n)) throw 'Parameter is multiple of 3!'
+            return ((2*n)/3) | 0
+        }
+
+        function mu(n) {
+            return 2*n + 1
+        }
+
+        function nu(n) {
+            return 2*n + 2
+        }
+
+        function seed(n) {
+            while (true) {
+                if (is_black(n)) return n
+                n = lambda(n)
+            }
+        }
+
+        function height(n) {
+            n2 = n
+            n2 = n
+            h = 0
+            while (true) {
+                if (n == 0) return h
+                if (is_white(n)) {
+                    n = lambda(n)
+                    if (is_white(n2)) {
+                        n2 = n
+                    } else {
+                        n2 = lambda(n2)
+                    }
+                } else if (is_white(n2)) {
+                    n2 = lambda(n2)
+                    n = n2
+                } else {
+                    n2 = nu(n)
+                    n = mu(n)
+                }
+                h += 1
+            }
+        }
+
+        function back(n){
+            if (n <= 0) throw 'Parameter must be positive!'
+            if (is_white(n)) return lambda(n)
+            b1 = mu(n)
+            b2 = nu(n)
+            if (back(b1) <= back(b2)) {
+                return b1
+            } else {
+                return b2
+            }
+        }
+
+        function subscript(n) {
+            res = '' + label(n)
+            while (n > 0) {
+            d = n % 10
+            res = String.fromCharCode(8320 + d) + res
+            n = Math.trunc(n / 10)
+            }
+            return res
+        }
+
+        // Create nodes
+        var nodes = new vis.DataSet([])
+        for (let i = 0; i < N; ++i) {
+            nodes.add([
+                {
+                    id: i,
+                    shape: 'circle',
+                    widthConstraint: {minimum: 20, maximum: 20},
+                    color: is_black(i) ? HSLToHex(0, 0., 50.) : HSLToHex(0, 0., 90.),
+                    font: {
+                        color: is_white(i) ? HSLToHex(0, 0., 50.) : HSLToHex(0, 0., 90.),
+                    },
+                    label: i == N-1 ? '...' : '' + label(i),
+                    x: 30. + 50.*i,
+                    y: 60.,
+                }
+            ])
+        }
+
+        // Create edges
+        var edges = new vis.DataSet([])
+        let bead = End
+        let hop = 0
+        while (bead != 0) {
+            b = back(bead)
+            if (b < N) {
+                edges.add([
+                    {
+                        id: nameEdge(bead, b),
+                        from: bead,
+                        to: b,
+                        arrows: {to: {enabled: true, scaleFactor: 0.2}},
+                        color: HSLToHex(16*hop, 80., 50.),
+                        label: '' + (hop + 1),
+                        smooth: {enabled: true, type: 'curvedCW'},
+                        width: 2,
+                    },
+                ])
+            }
+            bead = b
+            ++hop
+        }
+
+      // Create a network
+      var container = document.getElementById("mynetwork")
+      var data = {
+        nodes: nodes,
+        edges: edges,
+      }
+      var options = {
+        physics: false,
+      }
+      var network = new vis.Network(container, data, options);
+    </script>
+  </body>
+</html>
