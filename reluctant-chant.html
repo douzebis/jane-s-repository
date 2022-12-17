@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Network</title>
+    <script
+        type="text/javascript"
+        src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"
+    ></script>
+    <style type="text/css">
+        #mynetwork {
+            width: 800px;
+            height: 800px;
+            border: 0px solid lightgray;
+        }
+    </style>
+</head>
+<body>
+    <div id="mynetwork"></div>
+    <script
+        type="text/javascript"
+        src="./rosary-lib.js"
+    ></script>
+    <script type="text/javascript">
+        const params = new Proxy(new URLSearchParams(window.location.search), {
+            get: (searchParams, prop) => searchParams.get(prop),
+        })
+        console.log(params)  // TODO
+        console.log(coreluc(20))
+
+        const Pretty = params.pretty
+        const Ordinals = params.ordinals
+        const Width = params.n
+        const Height = params.n
+        const N = Width * Height
+        console.log(N)  // TODO
+        function nameEdge(i, j) {
+            return N*i + j
+        }
+
+        function giveI(n) {
+            return Math.trunc(n / nodesNB)
+        }
+
+        function giveJ(n) {
+            return n % nodesNB
+        }
+
+        // Create nodes
+        var nodes = new vis.DataSet([])
+        for (let s = 0; s < Width; ++s) {
+            for (let e = 0; e < Height; ++e) {
+                let nodeId = s*Width + e
+                let bead = ord(3*s, e)
+                let lab = label(bead)
+                let l = ''
+                if (Ordinals == 2) {
+                    l = '' + coreluc(bead)
+                } else {
+                    switch(bead) {
+                        case 1:
+                            l = '1' + (Pretty == 1 ? '' : super_st)
+                            break
+                        case 2:
+                        l = '2' + (Pretty == 1 ? '' : super_nd)
+                            break
+                        case 3:
+                        l = '3' + (Pretty == 1 ? '' : super_rd)
+                            break
+                        default:
+                        l = '' + bead + (Pretty == 1 ? '' : super_th)
+                            break
+                    }
+                }
+                if (Ordinals == 0) {
+                    col = e == 0 ? HSLToHex(0, 0., 50.) : HSLToHex(0, 0., 90.)
+                    fcol = e != 0 ? HSLToHex(0, 0., 50.) : HSLToHex(0, 0., 90.)
+                } else {
+                    col = HSLToHex(4*coreluc(bead), 80., 75.)
+                    fcol = HSLToHex(0, 0., 20.)
+                }
+                nodes.add([
+                    {
+                        id: nodeId,
+                        shape: 'circle',
+                        widthConstraint: {minimum: 30, maximum: 30},
+                        color: col,
+                        font: {
+                            color: fcol,
+                        },
+                        label: l,
+                        x: 30. + 60.*e,
+                        y: 10. + 60.*(Width - s),
+                    }
+                ])
+            }
+        }
+
+        // Create edges
+        var edges = new vis.DataSet([])
+        if (Ordinals != 0) {
+            for (let s = 0; s < Width; ++s) {
+                for (let e = 0; e < Height; ++e) {
+                    let node = s*Width + e
+                    let bead = ord(3*s, e)
+                    let corel = coreluc(bead)
+                    let bead2 = reluc(corel + 1)
+                    let s2 = seed(bead2)/3 | 0
+                    let e2 = lambex(bead2)
+                    let node2 = s2*Width + e2
+                    if (e2 < Width && s2 < Height) {
+                        if (s2 == s) {
+                            smooth = false
+                        } else {
+                            smooth = {enabled: true, type: 'curvedCW'}
+                        }
+                        edges.add([
+                            {
+                                id: nameEdge(node, node2),
+                                from: node,
+                                to: node2,
+                                arrows: {to: {enabled: true, scaleFactor: 0.2}},
+                                color: HSLToHex(4*corel, 80., 70.),
+                                smooth: smooth,
+                                width: (Pretty == 1 ? 3 : 3),
+                            },
+                        ])
+                    }
+                }
+            }
+        }
+
+      // Create a network
+      var container = document.getElementById("mynetwork")
+      var data = {
+        nodes: nodes,
+        edges: edges,
+      }
+      var options = {
+        physics: false,
+      }
+      var network = new vis.Network(container, data, options);
+    </script>
+  </body>
+</html>

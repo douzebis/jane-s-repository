@@ -76,6 +76,22 @@ function seed(n) {
     }
 }
 
+function lambex(n) {
+    lex = 0
+    while (true) {
+        if (is_black(n)) return lex
+        n = lambda(n)
+        ++lex
+    }
+}
+
+function ord(s, l) {
+    while (--l >= 0) {
+        s = up(s)
+    }
+    return s
+}
+
 function height(n) {
     n2 = n
     n2 = n
@@ -100,7 +116,7 @@ function height(n) {
     }
 }
 
-function back(n){
+function back(n) {
     if (n <= 0) throw 'Parameter must be positive!'
     if (is_white(n)) return lambda(n)
     b1 = mu(n)
@@ -110,4 +126,39 @@ function back(n){
     } else {
         return b2
     }
+}
+
+function reluc(n) {
+    if (n < 0) throw 'Parameter must be nonnegative!'
+    if (n == 0) return 0
+    const visited = [0]
+    bead = 1
+    for (let i = 1; i < n; ++i) {
+        visited[i] = bead
+        let l = label(bead)
+        if (! visited.includes(bead - l)) {
+            bead -= l
+        } else {
+            bead += l
+        }
+    }
+    return bead
+}
+
+function coreluc(bead) {
+    if (bead < 0) throw 'Parameter must be nonnegative!'
+    if (bead == 0) return 0
+    const visited = [0, 1]
+    b = 1
+    n = 1
+    while (b != bead) {
+        let l = label(b)
+        if (! visited.includes(b - l)) {
+            b -= l
+        } else {
+            b += l
+        }
+        visited[++n] = b
+    }
+    return n
 }
