@@ -22,6 +22,21 @@
         })
         console.log(params)  // TODO
 
+        const sup_st = 'ˢᵗ'
+        const sup_nd = 'ⁿᵈ'
+        const sub_rd = 'ʳᵈ'
+        const sup_th = 'ᵗʰ'
+
+        function subscript(n) {
+            res = '' + label(n)
+            while (n > 0) {
+            d = n % 10
+            res = String.fromCharCode(8320 + d) + res
+            n = Math.trunc(n / 10)
+            }
+            return res
+        }
+
         const End = params.n
         const N = End < 10 ? 10 : End
         console.log(N)  // TODO
@@ -134,16 +149,6 @@
             } else {
                 return b2
             }
-        }
-
-        function subscript(n) {
-            res = '' + label(n)
-            while (n > 0) {
-            d = n % 10
-            res = String.fromCharCode(8320 + d) + res
-            n = Math.trunc(n / 10)
-            }
-            return res
         }
 
         // Create nodes

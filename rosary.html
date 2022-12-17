@@ -22,6 +22,21 @@
         })
         console.log(params)  // TODO
 
+        const sup_st = 'ˢᵗ'
+        const sup_nd = 'ⁿᵈ'
+        const sup_rd = 'ʳᵈ'
+        const sup_th = 'ᵗʰ'
+
+        function subscript(n) {
+            res = '' + label(n)
+            while (n > 0) {
+            d = n % 10
+            res = String.fromCharCode(8320 + d) + res
+            n = Math.trunc(n / 10)
+            }
+            return res
+        }
+
         const N = params.n
         console.log(N)  // TODO
         function nameEdge(i, j) {
@@ -77,19 +92,26 @@
             return n%3 != 0
         }
 
-        function subscript(n) {
-            res = '' + label(n)
-            while (n > 0) {
-            d = n % 10
-            res = String.fromCharCode(8320 + d) + res
-            n = Math.trunc(n / 10)
-            }
-            return res
-        }
-
         // Create nodes
         var nodes = new vis.DataSet([])
         for (let i = 0; i < N; ++i) {
+            switch(i) {
+                case N - 1:
+                    ord = '...'
+                    break
+                case 1:
+                    ord = '1' + sup_st
+                    break
+                case 2:
+                    ord = '2' + sup_nd
+                    break
+                case 3:
+                    ord = '3' + sup_rd
+                    break
+                default:
+                    ord = '' + i + sup_th
+                    break
+            }
             nodes.add([
                 {
                     id: i,
@@ -99,7 +121,7 @@
                     font: {
                         color: is_white(i) ? HSLToHex(0, 0., 50.) : HSLToHex(0, 0., 90.),
                     },
-                    label: i == N-1 ? '...' : '' + label(i),
+                    label: ord,
                     x: 30. + 50.*i,
                     y: 30.,
                 }
