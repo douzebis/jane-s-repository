@@ -16,26 +16,15 @@
 </head>
 <body>
     <div id="mynetwork"></div>
+    <script
+        type="text/javascript"
+        src="./rosary-lib.js"
+    ></script>
     <script type="text/javascript">
         const params = new Proxy(new URLSearchParams(window.location.search), {
             get: (searchParams, prop) => searchParams.get(prop),
         })
         console.log(params)  // TODO
-
-        const sup_st = 'ˢᵗ'
-        const sup_nd = 'ⁿᵈ'
-        const sup_rd = 'ʳᵈ'
-        const sup_th = 'ᵗʰ'
-
-        function subscript(n) {
-            res = '' + label(n)
-            while (n > 0) {
-            d = n % 10
-            res = String.fromCharCode(8320 + d) + res
-            n = Math.trunc(n / 10)
-            }
-            return res
-        }
 
         const N = params.n
         console.log(N)  // TODO
@@ -56,41 +45,6 @@
         function giveJ(n) {
             return n % nodesNB
         }
-      
-        function HSLToHex(h, s, l) {
-            const hDecimal = l / 100
-            const a = (s * Math.min(hDecimal, 1 - hDecimal)) / 100
-            const f = (n) => {
-            const k = (n + h / 30) % 12
-            const color = hDecimal - a * Math.max(Math.min(k - 3, 9 - k, 1), -1)
-
-            // Convert to Hex and prefix with "0" if required
-            return Math.round(255 * color)
-                .toString(16)
-                .padStart(2, "0")
-            }
-            return `#${f(0)}${f(8)}${f(4)}`
-        }
-
-        function is_even(n) {
-            return n%2 == 0
-        }
-
-        function is_odd(n) {
-            return n%2 != 0
-        }
-
-        function label(n) {
-            return 1 + (n >> 1)
-        }
-
-        function is_black(n) {
-            return n%3 == 0
-        }
-
-        function is_white(n) {
-            return n%3 != 0
-        }
 
         // Create nodes
         var nodes = new vis.DataSet([])
@@ -100,16 +54,16 @@
                     ord = '...'
                     break
                 case 1:
-                    ord = '1' + sup_st
+                    ord = '1' + super_st
                     break
                 case 2:
-                    ord = '2' + sup_nd
+                    ord = '2' + super_nd
                     break
                 case 3:
-                    ord = '3' + sup_rd
+                    ord = '3' + super_rd
                     break
                 default:
-                    ord = '' + i + sup_th
+                    ord = '' + i + super_th
                     break
             }
             nodes.add([
