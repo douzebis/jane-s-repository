@@ -128,7 +128,8 @@
         // https://visjs.github.io/vis-network/docs/network/edges.html
         var edges = new vis.DataSet([])
         switch (Arrows) {
-            case 'naked', 'numbered':
+            case 'naked':
+            case 'numbered':
                 for (let s = 0; s < Width; ++s) {
                     for (let e = 0; e < Height; ++e) {
                         let node = s*Width + e
