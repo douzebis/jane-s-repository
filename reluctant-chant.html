@@ -35,7 +35,7 @@
         const Width = params.width
         const Height = params.height
         const Labels = params.labels  // ['none', 'position', 'label', 'height', 'reluctant']
-        const Arrows = params.arrows  // ['none', 'naked', 'numbered', 'height', 'sigma']
+        const Arrows = params.arrows  // ['none', 'naked', 'numbered', 'height', 'sigma', 'back']
         const Colors = params.colors  // ['none', 'reluctant']
         const Length = params.n  // ['all']
 
@@ -188,6 +188,7 @@
                 }
                 break
             case 'height':
+            case 'back':
                 for (let s = 0; s < Width; ++s) {
                     for (let e = 0; e < Height; ++e) {
                         let node = s*Width + e
@@ -211,7 +212,8 @@
                                 ])
                             }
                         } else if (bead != 0) {
-                            Array.of(back(bead)).forEach(bead2 => {
+                            new Array(mu(bead), nu(bead)).forEach(bead2 => {
+                                if (Arrows == 'sigma' && bead2 != back(bead)) return
                                 let s2 = seed(bead2)/3 | 0
                                 let e2 = lambex(bead2)
                                 let node2 = s2*Width + e2
@@ -223,6 +225,7 @@
                                             to: node2,
                                             arrows: {to: {enabled: true, scaleFactor: 0.2}},
                                             color: HSLToHex(13*(23-height(bead)), 80., 75.),
+                                            dashes: bead2 == back(bead) ? false : true,
                                             smooth: {enabled: true, type: 'vertical'},
                                             width: 3,
                                         },
