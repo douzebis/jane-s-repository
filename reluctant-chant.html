@@ -213,7 +213,7 @@
                             }
                         } else if (bead != 0) {
                             new Array(mu(bead), nu(bead)).forEach(bead2 => {
-                                if (Arrows == 'sigma' && bead2 != back(bead)) return
+                                if (Arrows != 'back' && bead2 != back(bead)) return
                                 let s2 = seed(bead2)/3 | 0
                                 let e2 = lambex(bead2)
                                 let node2 = s2*Width + e2
