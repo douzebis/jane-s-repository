@@ -127,9 +127,9 @@ function height(n) {
         if (is_white(n)) {
             n = lambda(n)
             if (is_white(n2)) {
-                n2 = n
-            } else {
                 n2 = lambda(n2)
+            } else {
+                n2 = n
             }
         } else if (is_white(n2)) {
             n2 = lambda(n2)
@@ -147,7 +147,7 @@ function back(n) {
     if (is_white(n)) return lambda(n)
     b1 = mu(n)
     b2 = nu(n)
-    if (back(b1) <= back(b2)) {
+    if (seed(b1) <= seed(b2)) {
         return b1
     } else {
         return b2

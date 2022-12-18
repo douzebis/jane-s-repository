@@ -34,8 +34,8 @@
 
         const Width = params.width
         const Height = params.height
-        const Labels = params.labels  // ['none', 'position', 'label', 'reluctant']
-        const Arrows = params.arrows  // ['none', 'naked', 'numbered']
+        const Labels = params.labels  // ['none', 'position', 'label', 'height', 'reluctant']
+        const Arrows = params.arrows  // ['none', 'naked', 'numbered', 'height']
         const Colors = params.colors  // ['none', 'reluctant']
         const Length = params.n  // ['all']
 
@@ -85,6 +85,9 @@
                         case 'label':
                             l = '' + label(bead)
                             break
+                        case 'height':
+                            l = '' + height(bead)
+                            break
                         case 'reluctant':
                             l = '' + corelu[bead]
                             break
@@ -97,6 +100,9 @@
                     || Colors == 'none') {
                     col = e == 0 ? HSLToHex(0, 0., 50.) : HSLToHex(0, 0., 90.)
                     fcol = e != 0 ? HSLToHex(0, 0., 50.) : HSLToHex(0, 0., 90.)
+                } else if (Labels == 'height') {
+                    col = HSLToHex(13*(23-height(bead)), 80., 75.)
+                    fcol = HSLToHex(0, 0., 20.)
                 } else {
                     col = HSLToHex(4*corelu[bead], 80., 75.)
                     fcol = HSLToHex(0, 0., 20.)
@@ -122,9 +128,7 @@
         // https://visjs.github.io/vis-network/docs/network/edges.html
         var edges = new vis.DataSet([])
         switch (Arrows) {
-            case 'none':
-                break
-            default:
+            case 'naked', 'numbered':
                 for (let s = 0; s < Width; ++s) {
                     for (let e = 0; e < Height; ++e) {
                         let node = s*Width + e
@@ -157,6 +161,54 @@
                         }
                     }
                 }
+                break
+            case 'height':
+                for (let s = 0; s < Width; ++s) {
+                    for (let e = 0; e < Height; ++e) {
+                        let node = s*Width + e
+                        let bead = ord(3*s, e)
+                        if (is_white(bead)) {
+                            let bead2 = lambda(bead)
+                            let s2 = seed(bead2)/3 | 0
+                            let e2 = lambex(bead2)
+                            let node2 = s2*Width + e2
+                            if (e2 < Width && s2 < Height) {
+                                edges.add([
+                                    {
+                                        id: nameEdge(node, node2),
+                                        from: node,
+                                        to: node2,
+                                        arrows: {to: {enabled: true, scaleFactor: 0.2}},
+                                        color: HSLToHex(13*(23-height(bead)), 80., 75.),
+                                        smooth: false,
+                                        width: 3,
+                                    },
+                                ])
+                            }
+                        } else if (bead != 0) {
+                            [back(bead)].forEach(bead2 => {
+                                let s2 = seed(bead2)/3 | 0
+                                let e2 = lambex(bead2)
+                                let node2 = s2*Width + e2
+                                if (e2 < Width && s2 < Height) {
+                                    edges.add([
+                                        {
+                                            id: nameEdge(node, node2),
+                                            from: node,
+                                            to: node2,
+                                            arrows: {to: {enabled: true, scaleFactor: 0.2}},
+                                            color: HSLToHex(13*(23-height(bead)), 80., 75.),
+                                            smooth: false, //{enabled: true, type: 'curvedCCW'},
+                                            width: 3,
+                                        },
+                                    ])
+                                }
+                            })
+                        }
+                    }
+                }
+                break
+            default:
                 break
         }
 
