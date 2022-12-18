@@ -171,7 +171,6 @@
                         let s2 = seed(bead2)/3 | 0
                         let e2 = lambex(bead2)
                         let node2 = s2*Width + e2
-                        console.log(bead2, s2, e2, node2)
                         if (e2 < Width && s2 < Height) {
                             edges.add([
                                 {
@@ -212,7 +211,7 @@
                                 ])
                             }
                         } else if (bead != 0) {
-                            new Array(back(bead)).forEach(bead2 => {
+                            Array.of(back(bead)).forEach(bead2 => {
                                 let s2 = seed(bead2)/3 | 0
                                 let e2 = lambex(bead2)
                                 let node2 = s2*Width + e2
@@ -224,7 +223,7 @@
                                             to: node2,
                                             arrows: {to: {enabled: true, scaleFactor: 0.2}},
                                             color: HSLToHex(13*(23-height(bead)), 80., 75.),
-                                            smooth: false, //{enabled: true, type: 'curvedCCW'},
+                                            smooth: {enabled: true, type: 'vertical'},
                                             width: 3,
                                         },
                                     ])
