@@ -100,7 +100,7 @@
                     || Colors == 'none') {
                     col = e == 0 ? HSLToHex(0, 0., 50.) : HSLToHex(0, 0., 90.)
                     fcol = e != 0 ? HSLToHex(0, 0., 50.) : HSLToHex(0, 0., 90.)
-                } else if (Labels == 'height') {
+                } else if (Labels == 'height' || Arrows == 'back') {
                     col = HSLToHex(13*(23-height(bead)), 80., 75.)
                     fcol = HSLToHex(0, 0., 20.)
                 } else {
@@ -226,7 +226,10 @@
                                             arrows: {to: {enabled: true, scaleFactor: 0.2}},
                                             color: HSLToHex(13*(23-height(bead)), 80., 75.),
                                             dashes: bead2 == back(bead) ? false : true,
-                                            smooth: {enabled: true, type: 'vertical'},
+                                            smooth: {
+                                                enabled: true,
+                                                type: bead2 == back(bead) ? 'curvedCW' : 'curvedCCW'
+                                            },
                                             width: 3,
                                         },
                                     ])
