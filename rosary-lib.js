@@ -2,6 +2,8 @@ const super_st = '\u02E2\u1D57'
 const super_nd = '\u207F\u1D48'
 const super_rd = '\u02B3\u1D48'
 const super_th = '\u1D57\u02B0'
+const arrow_up = '\u2191'
+const arrow_reluctant = '\u21AB'
 
 function subscript(n) {
     res = '' + label(n)
