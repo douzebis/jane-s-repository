@@ -69,9 +69,9 @@
             if (b < N) {
                 edges.add([
                     {
-                        id: nameEdge(bead, b),
-                        from: bead,
-                        to: b,
+                        id: nameEdge(b, bead),
+                        from: b,
+                        to: bead,
                         arrows: {to: {enabled: true, scaleFactor: 0.2}},
                         color: HSLToHex(16*hop, 80., 50.),
                         label: '' + (hop + 1),
