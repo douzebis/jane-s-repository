@@ -52,6 +52,11 @@ function up(n) {
     return n + label(n)
 }
 
+function upn(n, r) {
+    while (--r >= 0) n = up(n)
+    return n
+}
+
 function down(n) {
     return n - label(n)
 }
@@ -61,12 +66,24 @@ function lambda(n) {
     return ((2*n)/3) | 0
 }
 
+function lambdan(n, r) {
+    while (--r >= 0) {
+        if (is_black(n)) throw 'Parameter is multiple of 3!'
+        n = lambda(n)
+    }
+    return n
+}
+
 function mu(n) {
     return 2*n + 1
 }
 
 function nu(n) {
     return 2*n + 2
+}
+
+function black(n) {
+    return 3*n
 }
 
 function seed(n) {
@@ -80,6 +97,15 @@ function lambex(n) {
     lex = 0
     while (true) {
         if (is_black(n)) return lex
+        n = lambda(n)
+        ++lex
+    }
+}
+
+function seedandlamb(n) {
+    lex = 0
+    while (true) {
+        if (is_black(n)) return {seed: n, lambex: lex}
         n = lambda(n)
         ++lex
     }
@@ -161,4 +187,29 @@ function coreluc(bead) {
         visited[++n] = b
     }
     return n
+}
+
+function relucs(width, height) {
+    if (width < 0) throw 'width must be nonnegative!'
+    if (height < 0) throw 'height must be nonnegative!'
+    if (width == 0 || height == 0) return {rel: [], corel: []}
+    const corel = [0, 1]
+    const rel = [0, 1]
+    let b = 1
+    let n = 1
+    for (let bead = 0; bead <= upn(black(height-1), width-1); ++bead) {
+        let {seed: i, lambex: j} = seedandlamb(bead)
+        if (rel.includes(bead)) continue
+        while (b != bead) {
+            let l = label(b)
+            if (! rel.includes(b - l)) {
+                b -= l
+            } else {
+                b += l
+            }
+            rel[++n] = b
+            corel[b] = n
+        }
+    }
+    return {rel: rel, corel: corel}
 }
