@@ -35,7 +35,7 @@
         const Width = params.width
         const Height = params.height
         const Labels = params.labels  // ['none', 'position', 'label', 'height', 'reluctant']
-        const Arrows = params.arrows  // ['none', 'naked', 'numbered', 'height']
+        const Arrows = params.arrows  // ['none', 'naked', 'numbered', 'height', 'sigma']
         const Colors = params.colors  // ['none', 'reluctant']
         const Length = params.n  // ['all']
 
@@ -163,6 +163,31 @@
                     }
                 }
                 break
+            case 'sigma':
+                for (let s = 1; s < Width; ++s) {
+                    let node = s*Width
+                    let bead = ord(3*s, 0)
+                    new Array(bead-1, bead+1).forEach(bead2 => {
+                        let s2 = seed(bead2)/3 | 0
+                        let e2 = lambex(bead2)
+                        let node2 = s2*Width + e2
+                        console.log(bead2, s2, e2, node2)
+                        if (e2 < Width && s2 < Height) {
+                            edges.add([
+                                {
+                                    id: nameEdge(node, node2),
+                                    from: node,
+                                    to: node2,
+                                    arrows: {to: {enabled: true, scaleFactor: 0.2}},
+                                    color: HSLToHex(18*bead, 100., 60.),
+                                    smooth: {enabled: true, type: 'curvedCCW'},
+                                    width: 5,
+                                },
+                            ])
+                        }
+                    })
+                }
+                break
             case 'height':
                 for (let s = 0; s < Width; ++s) {
                     for (let e = 0; e < Height; ++e) {
@@ -187,7 +212,7 @@
                                 ])
                             }
                         } else if (bead != 0) {
-                            [back(bead)].forEach(bead2 => {
+                            new Array(back(bead)).forEach(bead2 => {
                                 let s2 = seed(bead2)/3 | 0
                                 let e2 = lambex(bead2)
                                 let node2 = s2*Width + e2
