@@ -121,6 +121,31 @@ function ord(s, l) {
 }
 
 function height(n) {
+    if (n < 0) throw new Error("n must be a nonnegative integer")
+    if (n == 0) return 0
+    if (n == 1) return 1
+    visited = [0, 1]  // the beads we have visited so far
+    rings = [Array.of(0), Array.of(1)]  // the beads ordered by height (min length of path from 0)
+    //console.log('v', visited)
+    //console.log('r', rings)
+    for (let height = 2; true; ++height) {
+        new_ring = []
+        for (let bead of rings[height - 1]) {
+            let label = (bead >> 1) + 1
+            for (let next_bead of [bead - label, bead + label]) {
+                if (!visited.includes(next_bead)) {
+                    if (next_bead == n) return height
+                    visited.push(next_bead)
+                    new_ring.push(next_bead)
+                }
+            }
+        }
+        //console.log(new_ring)
+        rings.push(new_ring)
+    }
+}
+
+function turboHeight(n) {
     n2 = n
     n2 = n
     h = 0
@@ -144,17 +169,17 @@ function height(n) {
     }
 }
 
-function back(n) {
-    if (n <= 0) throw 'Parameter must be positive!'
-    if (is_white(n)) return lambda(n)
-    b1 = mu(n)
-    b2 = nu(n)
-    if (seed(b1) <= seed(b2)) {
-        return b1
-    } else {
-        return b2
-    }
-}
+//function back(n) {
+//    if (n <= 0) throw 'Parameter must be positive!'
+//    if (is_white(n)) return lambda(n)
+//    b1 = mu(n)
+//    b2 = nu(n)
+//    if (seed(b1) <= seed(b2)) {
+//        return b1
+//    } else {
+//        return b2
+//    }
+//}
 
 function reluc(n) {
     if (n < 0) throw 'Parameter must be nonnegative!'
@@ -214,4 +239,101 @@ function relucs(width, height) {
         }
     }
     return {rel: rel, corel: corel}
+}
+
+function reluctant(n) {
+    if (n < 0) throw new Error("argument must be nonnegative")
+    if (n == 0) return 0
+    let visited = Array.of(0)
+    bead = 1
+    for (i = 1; i < n; ++i) {
+        visited[bead] = i
+        label = 1 + (bead >> 1)
+        if (visited[bead - label] == undefined) {
+            bead -= label  // moving down
+        } else {
+            bead += label  // moving up
+        }
+    }
+    return bead
+}
+
+function dither(n) {
+    if (n < 0) throw new Error("argument must be nonnegative")
+    let prev = 0
+    for (let i = 1; true; ++i) {
+        if (n == 0) return prev
+        let nxt = seed(reluctant(i))/3 | 0
+        if (nxt != prev) {
+            prev = nxt
+            --n
+        }
+    }
+}
+
+//function Height(n) {
+//    for (i = 0; true; ++i) {
+//        if (n == dither(i)) return i
+//}
+
+function Mu(n, k = 1) {
+    while (k > 0) {
+        n = seed(mu(3*n))/3 | 0
+        --k
+    }
+    return n
+}
+
+function Nu(n, k = 1) {
+    while (k > 0) {
+        n = seed(nu(3*n))/3 | 0
+        --k
+    }
+    return n
+}
+
+function back(n) {
+    if (n%3 != 0) return lambda(n)
+    m = mu(n)
+    n = lambda(m)
+    while (n%3 == 1) n = lambda(n)
+    if (n%3 == 2) return m
+    return m + 1
+}
+
+function backToSeed(n) {
+    if (n%3 != 0) return seed(n)
+    m = mu(n)
+    n = lambda(m)
+    while (n%3 == 1) n = lambda(n)
+    if (n%3 == 2) return seed(m)
+    return seed(m + 1)
+}
+
+function Back(n) {
+    return backToSeed(3*n)/3 | 0
+}
+
+function is_lower(n, m) {
+    if (n == 0) return true
+    while (m != 0) {
+        if (m == n) return true
+        m = Back(m)
+    }
+    return false
+}
+
+function HHeight(n) {
+    h = 0
+    while (n != 0) {
+        n = Back(n)
+        ++h
+    }
+    return h
+}
+
+function listHeight(h, l) {
+    for (i = 0; i < l; ++i) {
+        if (HHeight(i) == h) console.log(i)
+    }
 }

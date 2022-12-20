@@ -91,6 +91,14 @@
         edges: edges,
       }
       var options = {
+        // https://github.com/visjs/vis-network/issues/671
+        autoResize: false,
+        interaction: {
+            dragNodes: true,
+            dragView: false,
+            keyboard: false,
+            zoomView: false
+        },
         physics: false,
       }
       var network = new vis.Network(container, data, options);
