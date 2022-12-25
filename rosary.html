@@ -7,114 +7,129 @@
         src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"
     ></script>
     <style type="text/css">
-        #mynetwork {
-            width: 600px;
-            height: 60px;
-            border: 0px solid lightgray;
+        .container {
+        position: relative;
+        width: 100%;
+        padding-top: 27%;
+        }
+        .network {
+        position:  absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
         }
     </style>
 </head>
 <body>
-    <div id="mynetwork"></div>
+    <div class="container">
+        <div id="network" class="network"></div>
+    </div>
     <script
         type="text/javascript"
-        src="./rosary-lib.js"
+        src="./janestreet.js"
     ></script>
     <script type="text/javascript">
-        const params = new Proxy(new URLSearchParams(window.location.search), {
+        // Retrieve URL parameters
+        const P = new Proxy(new URLSearchParams(window.location.search), {
             get: (searchParams, prop) => searchParams.get(prop),
         })
-        console.log(params)  // TODO
-
-        const N = params.n
-        console.log(N)  // TODO
-        function nameEdge(i, j) {
-            if (i < j) {
-                return N*i + j
-            } else if (j < i) {
-                return N*j + i
-            } else {
-                return undefined
-            }
-        }
-
-        function giveI(n) {
-            return Math.trunc(n / nodesNB)
-        }
-
-        function giveJ(n) {
-            return n % nodesNB
-        }
+        // P.n          Count of nodes to display
+        // P.labels     ['position', 'label', 'height', 'reluctant_inv']
+        // P.arrows     ['none', 'up', 'down', 'both']
+        N = parseInt(P.n)
 
         // Create nodes
         var nodes = new vis.DataSet([])
         for (let i = 0; i < N; ++i) {
-            switch(i) {
-                case N - 1:
-                    ord = '...'
-                    break
-                case 1:
-                    ord = '1' + super_st
-                    break
-                case 2:
-                    ord = '2' + super_nd
-                    break
-                case 3:
-                    ord = '3' + super_rd
-                    break
-                default:
-                    ord = '' + i + super_th
-                    break
-            }
+            let diam = 800/N/2
             nodes.add([
                 {
-                    id: i,
+                    id: '' + i,
                     shape: 'circle',
-                    widthConstraint: {minimum: 20, maximum: 20},
-                    color: is_black(i) ? HSLToHex(0, 0., 50.) : HSLToHex(0, 0., 90.),
+                    widthConstraint: diam,
+                    color: is_black(i) ? hsl_to_col(0, 0., 50.) : hsl_to_col(0, 0., 90.),
                     font: {
-                        color: is_white(i) ? HSLToHex(0, 0., 50.) : HSLToHex(0, 0., 90.),
+                        size: 200/N,
+                        color: is_white(i) ? hsl_to_col(0, 0., 50.) : hsl_to_col(0, 0., 90.),
                     },
-                    label: ord,
-                    x: 30. + 50.*i,
-                    y: 30.,
+                    label: i == N-1 ? '..' : f_label(i, P.labels),
+                    x: diam/2 + i*(800 - diam)/N,
+                    y: 0,
                 }
             ])
         }
 
         // Create edges
         var edges = new vis.DataSet([])
-        for (let i = 1; i < N; ++i) {
-            edges.add([
-                {
-                    id: nameEdge(i - 1, i),
-                    from: i - 1,
-                    to: i,
-                    color: HSLToHex(0, 0., 50.),
-                    smooth: false,
-                    width: 1,
-                },
-            ])
+        if (P.arrows == 'none') {
+            for (let i = 0; i < N - 1; ++i) {
+                edges.add([
+                    {
+                        id: '' + i,
+                        from: i,
+                        to: i + 1,
+                        color: hsl_to_col(0, 0., 50.),
+                        smooth: false,
+                        width: 1,
+                    },
+                ])
+            }
+        } else {
+            if (P.arrows == 'up' || P.arrows == 'both') {
+                for (let i = 0; i < N - 1; ++i) {
+                    edges.add([
+                        {
+                            id: 'u' + i,
+                            from: i,
+                            to: up(i),
+                            arrows: {to: {enabled: true, scaleFactor: 0.2}},
+                            color: hsl_to_col(8*i, 80., 50.),
+                            smooth: {enabled: true, type: 'curvedCW'},
+                            width: 2,
+                        },
+                    ])
+                }
+            }
+            if (P.arrows == 'down' || P.arrows == 'both') {
+                for (let i = 1; i < N - 1; ++i) {
+                    edges.add([
+                        {
+                            id: 'd' + i,
+                            from: i,
+                            to: down(i),
+                            arrows: {to: {enabled: true, scaleFactor: 0.2}},
+                            color: hsl_to_col(8*i, 80., 50.),
+                            smooth: {enabled: true, type: 'curvedCW'},
+                            width: 2,
+                        },
+                    ])
+                }
+            }
         }
 
-      // Create a network
-      var container = document.getElementById("mynetwork")
-      var data = {
-        nodes: nodes,
-        edges: edges,
-      }
-      var options = {
+        // Create a network
+        var container = document.getElementById("network")
+        var data = {
+            //autoResize: true,
+            //width:'100%',
+            //eight:'100%',
+            nodes: nodes,
+            edges: edges,
+        }
+        var options = {
         // https://github.com/visjs/vis-network/issues/671
-        autoResize: false,
+        //autoResize: false,
         interaction: {
-            dragNodes: true,
-            dragView: false,
+            dragNodes: P.interactive == 'yes' ? true: false,
+            dragView: P.interactive == 'yes' ? true: false,
             keyboard: false,
-            zoomView: false
+            zoomView: P.interactive == 'yes' ? true: false,
         },
         physics: false,
       }
       var network = new vis.Network(container, data, options);
+      network.fit()
     </script>
   </body>
 </html>

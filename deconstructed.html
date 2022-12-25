@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Network</title>
+    <script
+        type="text/javascript"
+        src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"
+    ></script>
+    <style type="text/css">
+        .container {
+        position: relative;
+        width: 100%;
+        padding-top: 100%;
+        }
+        .network {
+        position:  absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="network" class="network"></div>
+    </div>
+    <script
+        type="text/javascript"
+        src="./janestreet.js"
+    ></script>
+    <script type="text/javascript">
+        // Retrieve URL parameters
+        const P = new Proxy(new URLSearchParams(window.location.search), {
+            get: (searchParams, prop) => searchParams.get(prop),
+        })
+        // P.n          Count of nodes to display (0 means all)
+        // P.width      Count of seeds
+        // P.height     Count of lambdex
+        // P.ordering   ['none', 'up_n_down', 'height', 'canonic', 'back', 'reluctant']
+        // P.label     ['none', 'position', 'label', 'height', 'reluctant_inv']
+        // P.color     ['none', 'position', 'label', 'height', 'reluctant_inv']
+        // P.arrows     ['no', 'yes', 'labelled']
+        let wid = parseInt(P.width)
+        let hei = parseInt(P.height)
+        let sym = P.sym == 'yes' ? true : false
+
+        const WIDTH_REF = 800
+        const FONT_REF = 200
+        const ARROW_REF = 30
+        const ARROW_LABEL_REF = 100
+        const BLACK = hsl_to_col(0, 0, 30)
+        const WHITE = hsl_to_col(0, 0, 90)
+
+        class Do {
+            static n
+            static seeds
+            static lambexes
+            static side
+            static ordering
+            static label
+            static color
+            static arrows
+
+            static positions
+            static positions_max
+            static labels
+            static labels_max
+            static heights
+            static heights_max
+            static reluctant_invs
+            static reluctant_invs_max
+
+            static init(n, seeds, lambexes, ordering, lab, color, arrows) {
+                this.n = n
+                this.seeds = seeds
+                this.lambexes = lambexes
+                this.side = Math.max(seeds, lambexes)
+                this.ordering = ordering
+                this.label = lab
+                this.color = color
+                this.arrows = arrows
+
+                // Positions
+                this.positions = []
+                for (let x = 0; x < this.lambexes; ++x) {
+                    for (let y = 0; y < this.lambexes; ++y) {
+                        this.positions.push(up(3*x, y))
+                    }
+                }
+                this.positions_max = Math.max.apply(null, this.positions)
+
+                // Labels
+                this.labels = []
+                for (let x = 0; x < this.lambexes; ++x) {
+                    for (let y = 0; y < this.lambexes; ++y) {
+                        this.labels.push(
+                            label(this.positions[this.lambexes*x+y]))
+                    }
+                }
+                this.labels_max = Math.max.apply(null, this.labels)
+
+                // Heights
+                this.heights = []
+                for (let x = 0; x < this.lambexes; ++x) {
+                    for (let y = 0; y < this.lambexes; ++y) {
+                        this.heights.push(
+                            height(this.positions[this.lambexes*x+y]))
+                    }
+                }
+                this.heights_max = Math.max.apply(null, this.heights)
+
+                // Reluctant_invs
+                this.reluctant_invs = []
+                for (let x = 0; x < this.lambexes; ++x) {
+                    for (let y = 0; y < this.lambexes; ++y) {
+                        this.reluctant_invs.push(
+                            reluctant_inv(this.positions[this.lambexes*x+y]))
+                    }
+                }
+                this.reluctant_invs_max = Math.max.apply(null, this.reluctant_invs)
+
+            }
+
+            static node_color(x, y) {
+                switch (this.color) {
+                    case 'position': {
+                        let value = 2 + this.positions[this.lambexes*x+y]
+                        if (this.n != 0 && value >= this.n) {
+                            return y == 0 ? BLACK : WHITE
+                        }
+                        let hue = 360*Math.log2(value)/Math.log2(this.positions_max)
+                        return hsl_to_col(hue, 80, 75)
+                    }
+                    case 'height': {
+                        let value = this.heights[this.lambexes*x+y]
+                        if (this.n != 0 && value >= this.n) {
+                            return y == 0 ? BLACK : WHITE
+                        }
+                        let hue = 360*value/this.heights_max
+                        return hsl_to_col(hue, 80, 75)
+                    }
+                    case 'reluctant_inv': {
+                        let value = this.reluctant_invs[this.lambexes*x+y]
+                        if (this.n != 0 && value >= this.n) {
+                            return y == 0 ? BLACK : WHITE
+                        }
+                        //let hue = 360*value/this.reluctant_invs_max
+                        let hue = this.reluctant_invs.reduce((c, e) => {
+                            return e < value ? c + 1 : c
+                            }, 0) * 360 / this.side**2
+                        return hsl_to_col(hue, 80, 75)
+                    }
+                    case 'none':
+                    default: {
+                        return y == 0 ? BLACK : WHITE
+                    }
+                }
+            }
+
+            static font_color(x, y) {
+                switch (this.color) {
+                    case 'position': {
+                        let value = this.positions[this.lambexes*x+y]
+                        if (this.n != 0 && value >= this.n) {
+                            return y != 0 ? BLACK : WHITE
+                        }
+                        return BLACK
+                    }
+                    case 'height': {
+                        let value = this.heights[this.lambexes*x+y]
+                        if (this.n != 0 && value >= this.n) {
+                            return y != 0 ? BLACK : WHITE
+                        }
+                        return BLACK
+                    }
+                    case 'reluctant_inv': {
+                        let value = this.reluctant_invs[this.lambexes*x+y]
+                        if (this.n != 0 && value >= this.n) {
+                            return y != 0 ? BLACK : WHITE
+                        }
+                        return BLACK
+                    }
+                    case 'none':
+                    default: {
+                        return y != 0 ? BLACK : WHITE
+                    }
+                }
+            }
+
+            static nodes(x, y) {
+                let node_id = this.lambexes*x + y
+                return [{
+                    id: '' + node_id,
+                    shape: 'circle',
+                    widthConstraint: WIDTH_REF/this.side/1.8,
+                    color: this.node_color(x, y),
+                    font: {
+                        size: FONT_REF/this.side,
+                        color: this.font_color(x, y),
+                    },
+                    label: f_label(this.positions[node_id], this.label),
+                    x: sym ? (x + 1)*WIDTH_REF/(this.side + 1) : (y + 1)*WIDTH_REF/(this.side + 1),
+                    y: sym ? (this.side - y)*WIDTH_REF/(this.side + 1) : (this.side - x)*WIDTH_REF/(this.side + 1),
+                }]
+            }
+
+            static edges(x, y) {
+                if (this.arrows == 'no') return []
+                let node_id = this.lambexes*x + y
+                let node = this.positions[node_id]
+                switch (this.ordering) {
+                    case 'up_n_down': {
+                        return []
+                    }
+                    case 'height': {
+                        if (node_id == 0) return []
+                        let h = this.heights[node_id] - 1
+                        return this.heights.reduce((a, c, nxt_node_id) => {
+                                if (c == h) {
+                                    let nxt_node = up(
+                                        3*Math.floor(nxt_node_id/this.side),
+                                        nxt_node_id%this.side)
+                                    let smooth = node == up(nxt_node) ?
+                                        false : {enabled: true, type: 'curvedCW'}
+                                    let label = this.arrows == 'yes' ?
+                                        '' : '' + nxt_node
+                                    a.push({
+                                        id: node_id*this.side**2 + nxt_node_id,
+                                        from: node_id,
+                                        to: nxt_node_id,
+                                        arrows: {to: {enabled: true, scaleFactor: 0.2}},
+                                        label: label,
+                                        font: {
+                                            size: ARROW_LABEL_REF/this.side,
+                                            align: 'middle',
+                                            vadjust: -10,
+                                        },
+                                        smooth: smooth,
+                                        width: ARROW_REF/this.side,
+                                    })
+                                }
+                                return a
+                            }, [])
+                    }
+                    case 'canonic': {
+                        if (node_id == 0) return []
+                        let node_ord = this.heights[node_id]
+                        if (this.n != 0 && node_ord >= this.n) return []
+                        let nxt_node = back(node)
+                        let nxt_node_id = this.positions.findIndex(e => e == nxt_node)
+                        if (nxt_node_id < 0) return []
+                        let smooth = node == up(nxt_node) ?
+                            false : {enabled: true, type: 'curvedCCW'}
+                        let label = this.arrows == 'yes' ?
+                            '' : '' + nxt_node
+                        return [{
+                            id: nxt_node_id*this.side**2 + node_id,
+                            from: nxt_node_id,
+                            to: node_id,
+                            arrows: {to: {enabled: true, scaleFactor: 0.2}},
+                            label: label,
+                            font: {
+                                size: ARROW_LABEL_REF/this.side,
+                                align: 'middle',
+                                vadjust: -10,
+                            },
+                            smooth: smooth,
+                            width: ARROW_REF/this.side,
+                        }]
+                    }
+                    case 'back': {
+                        if (node == 0) return []
+                        if (this.n != 0 && height(node_id) >= this.n) return []
+                        let back_node = back(node)
+                        let back_node_id = this.positions.findIndex(e => e == back_node)
+                        if (up(back_node) == node) {
+                            return [{
+                                id: node_id*this.side**2 + back_node_id,
+                                from: node_id,
+                                to: back_node_id,
+                                arrows: {to: {enabled: true, scaleFactor: 0.2}},
+                                smooth: false,
+                                width: ARROW_REF/this.side,
+                            }]
+                        } else {
+                            let kcab_node = mu(node)
+                            if (kcab_node == back_node) kcab_node = nu(node)
+                            let kcab_node_id = this.positions.findIndex(e => e == kcab_node)
+                            return [{
+                                id: node_id*this.side**2 + back_node_id,
+                                from: node_id,
+                                to: back_node_id,
+                                arrows: {to: {enabled: true, scaleFactor: 0.2}},
+                                smooth: {enabled: true, type: 'curvedCCW'},
+                                width: ARROW_REF/this.side,
+                            },{
+                                id: node_id*this.side**2 + kcab_node_id,
+                                from: node_id,
+                                to: kcab_node_id,
+                                arrows: {to: {enabled: true, scaleFactor: 0.2}},
+                                smooth: {enabled: true, type: 'curvedCW'},
+                                width: ARROW_REF/this.side,
+                                dashes: true,
+                            }]
+                        }
+                    }
+                    case 'reluctant': {
+                        if (node_id == 0) return []
+                        let node_ord = this.reluctant_invs[node_id]
+                        if (this.n != 0 && node_ord >= this.n) return []
+                        let prev_node_id = this.reluctant_invs.findIndex(e => e == node_ord - 1)
+                        if (prev_node_id < 0) return []
+                        let prev_node = up(
+                                        3*Math.floor(prev_node_id/this.side),
+                                        prev_node_id%this.side)
+                        let smooth = node == up(prev_node) ?
+                            false : {enabled: true, type: 'curvedCCW'}
+                        let label = this.arrows == 'yes' ?
+                            '' : '' + node_ord
+                        return [{
+                            id: prev_node_id*this.side**2 + node_id,
+                            from: prev_node_id,
+                            to: node_id,
+                            arrows: {to: {enabled: true, scaleFactor: 0.2}},
+                            label: label,
+                            font: {
+                                size: ARROW_LABEL_REF/this.side,
+                                align: 'middle',
+                                vadjust: -10,
+                            },
+                            smooth: smooth,
+                            width: ARROW_REF/this.side,
+                        }]
+                    }
+                    case 'none':
+                    default: {
+                        return []
+                    }
+                }
+            }
+        }
+
+        Do.init(parseInt(P.n), wid, hei, P.ordering, P.label, P.color, P.arrows)
+
+        // Create nodes
+        // https://visjs.github.io/vis-network/docs/network/nodes.html
+        let nodes = new vis.DataSet([])
+        for (let x = 0; x < wid; ++x) {
+            for (let y = 0; y < hei; ++y) {
+                nodes.add(Do.nodes(x, y))
+            }
+        }
+
+        // Create edges
+        // https://visjs.github.io/vis-network/docs/network/edges.html
+        let edges = new vis.DataSet([])
+        for (let x = 0; x < wid; ++x) {
+            for (let y = 0; y < hei; ++y) {
+                edges.add(Do.edges(x, y))
+            }
+        }
+
+        // Create a network
+        var container = document.getElementById("network")
+        var data = {
+            nodes: nodes,
+            edges: edges,
+        }
+        var options = {
+        // https://github.com/visjs/vis-network/issues/671
+        interaction: {
+            dragNodes: P.interactive == 'yes' ? true: false,
+            dragView: P.interactive == 'yes' ? true: false,
+            keyboard: false,
+            zoomView: P.interactive == 'yes' ? true: false,
+        },
+        physics: false,
+      }
+      var network = new vis.Network(container, data, options);
+    </script>
+  </body>
+</html>
