@@ -36,7 +36,7 @@
         })
         // P.n          Count of nodes to display
         // P.labels     ['position', 'label', 'height', 'reluctant_inv']
-        // P.arrows     ['none', 'up', 'down', 'both']
+        // P.arrows     ['none', 'up', 'down', 'both', 'to3']
         N = parseInt(P.n)
 
         // Create nodes
@@ -72,6 +72,26 @@
                         color: hsl_to_col(0, 0., 50.),
                         smooth: false,
                         width: 1,
+                    },
+                ])
+            }
+        } else if (P.arrows == 'to3') {
+            for (let i of [1, 2, 4, 7, 3]) {
+                edges.add([
+                    {
+                        id: '' + i,
+                        from: back(i),
+                        to: i,
+                        arrows: {to: {enabled: true, scaleFactor: 0.2}},
+                        label: '' + height(i),
+                        font: {
+                            size: 10,
+                            //align: 'middle',
+                            vadjust: -10,
+                        },
+                        color: hsl_to_col(8*back(i), 80., 50.),
+                        smooth: {enabled: true, type: 'curvedCW'},
+                        width: 2,
                     },
                 ])
             }
@@ -111,15 +131,11 @@
         // Create a network
         var container = document.getElementById("network")
         var data = {
-            //autoResize: true,
-            //width:'100%',
-            //eight:'100%',
             nodes: nodes,
             edges: edges,
         }
         var options = {
         // https://github.com/visjs/vis-network/issues/671
-        //autoResize: false,
         interaction: {
             dragNodes: P.interactive == 'yes' ? true: false,
             dragView: P.interactive == 'yes' ? true: false,
@@ -129,7 +145,7 @@
         physics: false,
       }
       var network = new vis.Network(container, data, options);
-      network.fit()
+      //network.fit()
     </script>
   </body>
 </html>
