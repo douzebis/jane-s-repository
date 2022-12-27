@@ -11,7 +11,7 @@
         position: relative;
         overflow: hidden;
         width: 100%;
-        padding-top: 30%;
+        padding-top: 25%;
         z-index: 1;
         }
         .network {
@@ -60,7 +60,7 @@
                     },
                     label: i == N-1 ? '..' : f_label(i, P.labels),
                     x: diam/2 + i*(WIDTH - diam)/N,
-                    y: WIDTH*0.13,
+                    y: 0,
                 }
             ])
         }
@@ -150,7 +150,7 @@
         physics: false,
       }
       var network = new vis.Network(container, data, options);
-      network.fit()
+      //network.fit()
     </script>
   </body>
 </html>
