@@ -37,6 +37,7 @@
         div = $('#network');
         width = div.width();
         div.css('height', width);
+        BASE = document.getElementById("network").clientWidth
 
         // Retrieve URL parameters
         const P = new Proxy(new URLSearchParams(window.location.search), {
@@ -53,10 +54,10 @@
         let hei = parseInt(P.height)
         let sym = P.sym == 'yes' ? true : false
 
-        const WIDTH_REF = 800
-        const FONT_REF = 200
-        const ARROW_REF = 30
-        const ARROW_LABEL_REF = 100
+        const WIDTH_REF = BASE
+        const FONT_REF = BASE/4
+        const ARROW_REF = BASE/25
+        const ARROW_LABEL_REF = BASE/8
         const BLACK = hsl_to_col(0, 0, 30)
         const WHITE = hsl_to_col(0, 0, 90)
 

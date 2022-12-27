@@ -34,7 +34,7 @@
         src="./janestreet.js"
     ></script>
     <script type="text/javascript">
-        // Set "network" div height
+        // Set "container" and "network" div height
         let div = $('.container');
         let width = div.width();
         div.css('height', width*0.27);
@@ -60,7 +60,6 @@
         //    div.css('background', 'red');
         //});
         BASE = document.getElementById("network").clientWidth
-        console.log(BASE)
         // Retrieve URL parameters
         const P = new Proxy(new URLSearchParams(window.location.search), {
             get: (searchParams, prop) => searchParams.get(prop),
