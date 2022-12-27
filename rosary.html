@@ -42,11 +42,12 @@
         // P.labels     ['position', 'label', 'height', 'reluctant_inv']
         // P.arrows     ['none', 'up', 'down', 'both', 'to3']
         N = parseInt(P.n)
+        WIDTH = document.getElementById("network").clientWidth
 
         // Create nodes
         var nodes = new vis.DataSet([])
         for (let i = 0; i < N; ++i) {
-            let diam = 800/N/2
+            let diam = WIDTH/N/2
             nodes.add([
                 {
                     id: '' + i,
@@ -58,7 +59,7 @@
                         color: is_white(i) ? hsl_to_col(0, 0., 50.) : hsl_to_col(0, 0., 90.),
                     },
                     label: i == N-1 ? '..' : f_label(i, P.labels),
-                    x: diam/2 + i*(800 - diam)/N,
+                    x: diam/2 + i*(WIDTH - diam)/N,
                     y: 0,
                 }
             ])
