@@ -399,47 +399,42 @@ function heights2(n) {
     let view = []
     let i = 0
     if (n > 0) view.push({x: 1, y: 0})
-    if (n > 1) view.push({x: Math.log(++i), y: 1})
-    if (n > 2) view.push({x: Math.log(++i), y: 2})
-    if (n > 3) view.push({x: Math.log(++i), y: 5})
-    if (n > 4) view.push({x: Math.log(++i), y: 3})
-    if (n > 5) view.push({x: Math.log(++i), y: 6})
-    if (n > 6) view.push({x: Math.log(++i), y: 9})
-    if (n > 7) view.push({x: Math.log(++i), y: 4})
-    if (n > 8) view.push({x: Math.log(++i), y: 7})
+    if (n > 1) view.push({x: Math.log10(++i), y: 1})
+    if (n > 2) view.push({x: Math.log10(++i), y: 2})
+    if (n > 3) view.push({x: Math.log10(++i), y: 5})
+    if (n > 4) view.push({x: Math.log10(++i), y: 3})
+    if (n > 5) view.push({x: Math.log10(++i), y: 6})
+    if (n > 6) view.push({x: Math.log10(++i), y: 9})
+    if (n > 7) view.push({x: Math.log10(++i), y: 4})
+    if (n > 8) view.push({x: Math.log10(++i), y: 7})
     let eight = 0
     let six = 5
     while (true) {
         eight += 8
         if (++i >= n) return view  //  0
-        view.push({x: Math.log(i), y: view[eight].y + 3})
+        view.push({x: Math.log10(i), y: view[eight].y + 3})
         if (++i >= n) return view  //  1
-        view.push({x: Math.log(i), y: view[++six].y + 1})
+        view.push({x: Math.log10(i), y: view[++six].y + 1})
         if (++i >= n) return view  //  2
-        view.push({x: Math.log(i), y: view[++six].y + 1})
+        view.push({x: Math.log10(i), y: view[++six].y + 1})
         if (++i >= n) return view  //  3
         if (view[eight + 2].y <= view[eight + 3].y) {
-            view.push({x: Math.log(i), y: view[eight + 2].y + 3})
+            view.push({x: Math.log10(i), y: view[eight + 2].y + 3})
         } else {
-            view.push({x: Math.log(i), y: view[eight + 3].y + 3})
+            view.push({x: Math.log10(i), y: view[eight + 3].y + 3})
         }
         if (++i >= n) return view  //  4
-        view.push({x: Math.log(i), y: view[++six].y + 1})
+        view.push({x: Math.log10(i), y: view[++six].y + 1})
         if (++i >= n) return view  //  5
-        view.push({x: Math.log(i), y: view[++six].y + 1})
+        view.push({x: Math.log10(i), y: view[++six].y + 1})
         if (++i >= n) return view  //  6
-        view.push({x: Math.log(i), y: view[eight + 5].y + 3})
+        view.push({x: Math.log10(i), y: view[eight + 5].y + 3})
         if (++i >= n) return view  //  7
-        view.push({x: Math.log(i), y: view[++six].y + 1})
+        view.push({x: Math.log10(i), y: view[++six].y + 1})
         if (++i >= n) return view  //  8
-        view.push({x: Math.log(i), y: view[++six].y + 1})
+        view.push({x: Math.log10(i), y: view[++six].y + 1})
     }
 }
-
-//function toto(a) {
-//    let view = new Uint8Array(a)
-//    for (let i in view) console.log(i, view[i])
-//}
 
 function back(n) {
     // We aim at performing exact integer calculus
