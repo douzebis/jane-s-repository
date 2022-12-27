@@ -4,41 +4,28 @@
     <title>Network</title>
     <script
         type="text/javascript"
+        src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js">
+    </script>
+    <script
+        type="text/javascript"
         src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"
     ></script>
-    <style type="text/css">
-        .container {
-        position: relative;
-        width: 100%;
-        }
-        .network {
-        position:  absolute;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        right: 0;
-        width: 100%;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div id="network" class="network"></div>
-    </div>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
     <script
         type="text/javascript"
         src="./janestreet.js"
     ></script>
+</head>
+<body>
+    <div
+        id="network"
+        style="position: relative; width: 100%; border: none">
+    </div>
     <script type="text/javascript">
+
         // Set "container" and "network" div height
-        let div = $('.container');
-        let width = div.width();
-        div.css('height', width);
-        div = $('#network');
-        width = div.width();
-        div.css('height', width);
-        BASE = document.getElementById("network").clientWidth
+        let NETWORK = $('#network');
+        let BASE = NETWORK.width();
+        NETWORK.css('height', BASE);
 
         // Retrieve URL parameters
         const P = new Proxy(new URLSearchParams(window.location.search), {
