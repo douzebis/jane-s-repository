@@ -60,7 +60,7 @@
                     },
                     label: i == N-1 ? '..' : f_label(i, P.labels),
                     x: diam/2 + i*(WIDTH - diam)/N,
-                    y: 0,
+                    y: WIDTH*0.13,
                 }
             ])
         }
@@ -92,7 +92,7 @@
                         font: {
                             size: WIDTH/8/N,
                             //align: 'middle',
-                            vadjust: -10,
+                            vadjust: -WIDTH/8/N,
                         },
                         color: hsl_to_col(8*back(i), 80., 50.),
                         smooth: {enabled: true, type: 'curvedCW'},
