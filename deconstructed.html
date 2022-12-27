@@ -10,7 +10,6 @@
         .container {
         position: relative;
         width: 100%;
-        padding-top: 100%;
         }
         .network {
         position:  absolute;
@@ -18,6 +17,7 @@
         left: 0;
         bottom: 0;
         right: 0;
+        width: 100%;
         }
     </style>
 </head>
@@ -30,6 +30,14 @@
         src="./janestreet.js"
     ></script>
     <script type="text/javascript">
+        // Set "container" and "network" div height
+        let div = $('.container');
+        let width = div.width();
+        div.css('height', width);
+        div = $('#network');
+        width = div.width();
+        div.css('height', width);
+
         // Retrieve URL parameters
         const P = new Proxy(new URLSearchParams(window.location.search), {
             get: (searchParams, prop) => searchParams.get(prop),
