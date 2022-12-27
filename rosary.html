@@ -6,12 +6,13 @@
         type="text/javascript"
         src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"
     ></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
     <style type="text/css">
         .container {
         position: relative;
         overflow: hidden;
         width: 100%;
-        padding-top: 27%;
+        /*padding-top: 27%;*/
         z-index: 1;
         }
         .network {
@@ -21,7 +22,6 @@
         bottom: 0;
         right: 0;
         width: 100%;
-        height: 100%;
         }
     </style>
 </head>
@@ -34,6 +34,33 @@
         src="./janestreet.js"
     ></script>
     <script type="text/javascript">
+        // Set "network" div height
+        let div = $('.container');
+        let width = div.width();
+        div.css('height', width*0.27);
+        div = $('#network');
+        width = div.width();
+        div.css('height', width*0.27);
+        //$(window).resize(function() {
+        //    var div = $('.container');
+        //    var width = div.width();
+        //    div.css('height', width*0.27);
+        //    div = $('#network');
+        //    width = div.width();
+        //    div.css('height', width*0.27);
+        //    div.css('background', 'red');
+        //});
+        //$(document).ready(function() {
+        //    var div = $('.container');
+        //    var width = div.width();
+        //    div.css('height', width*0.27);
+        //    div = $('#network');
+        //    width = div.width();
+        //    div.css('height', width*0.27);
+        //    div.css('background', 'red');
+        //});
+        BASE = document.getElementById("network").clientWidth
+        console.log(BASE)
         // Retrieve URL parameters
         const P = new Proxy(new URLSearchParams(window.location.search), {
             get: (searchParams, prop) => searchParams.get(prop),
@@ -42,13 +69,6 @@
         // P.labels     ['position', 'label', 'height', 'reluctant_inv']
         // P.arrows     ['none', 'up', 'down', 'both', 'to3']
         N = parseInt(P.n)
-        WIDTH = document.getElementById("network").clientWidth
-        HEIGHT = document.getElementById("network").clientHeight
-        if (HEIGHT > WIDTH*0.27) {
-            BASE = WIDTH
-        } else {
-            BASE = HEIGHT/0.27
-        }
 
         // Create nodes
         var nodes = new vis.DataSet([])
