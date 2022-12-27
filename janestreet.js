@@ -72,13 +72,13 @@ function f_label_position(n) {
     res = '' + n
     switch (n) {
     case 1:
-        return res + uni_st
+        return res  // + uni_st
     case 2:
-        return res + uni_nd
+        return res  // + uni_nd
     case 3:
-        return res + uni_rd
+        return res  // + uni_rd
     default:
-        return res + uni_th
+        return res  // + uni_th
     }
 }
 function f_label_label(n) {

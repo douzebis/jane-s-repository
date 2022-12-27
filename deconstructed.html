@@ -25,6 +25,7 @@
     <div class="container">
         <div id="network" class="network"></div>
     </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
     <script
         type="text/javascript"
         src="./janestreet.js"
@@ -202,7 +203,7 @@
                 return [{
                     id: '' + node_id,
                     shape: 'circle',
-                    widthConstraint: WIDTH_REF/this.side/1.8,
+                    widthConstraint: WIDTH_REF/this.side/2,
                     color: this.node_color(x, y),
                     font: {
                         size: FONT_REF/this.side,
