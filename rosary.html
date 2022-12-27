@@ -55,7 +55,7 @@
                     widthConstraint: diam,
                     color: is_black(i) ? hsl_to_col(0, 0., 50.) : hsl_to_col(0, 0., 90.),
                     font: {
-                        size: 200/N,
+                        size: WIDTH/4/N,
                         color: is_white(i) ? hsl_to_col(0, 0., 50.) : hsl_to_col(0, 0., 90.),
                     },
                     label: i == N-1 ? '..' : f_label(i, P.labels),
@@ -90,7 +90,7 @@
                         arrows: {to: {enabled: true, scaleFactor: 0.2}},
                         label: '' + height(i),
                         font: {
-                            size: 10,
+                            size: WIDTH/8/N,
                             //align: 'middle',
                             vadjust: -10,
                         },
