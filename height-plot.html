@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Network</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uplot@1.6.7/dist/uPlot.min.css">
+    <script
+        type="text/javascript"
+        src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"
+    ></script>
+    <script
+        type="text/javascript"
+        src="https://cdn.jsdelivr.net/npm/uplot@1.6.7/dist/uPlot.iife.min.js"
+    ></script>
+    <script
+        type="text/javascript"
+        src="./janestreet.js"
+    ></script>
+</head>
+<body>
+    <div id="plot" style="width: 100%"></div>
+    <script type="text/javascript">
+
+        // Set "container" and "network" div height
+        let PLOT = $('#plot')
+        let WIDTH = PLOT.width()
+        let HEIGHT = WIDTH/1.8
+        PLOT.css('height', HEIGHT)
+
+        // Retrieve URL parameters
+        const P = new Proxy(new URLSearchParams(window.location.search), {
+            get: (searchParams, prop) => searchParams.get(prop),
+        })
+        // N.n          Count of nodes to display
+
+        let n = parseInt(P.n)
+        let xs = range(n)
+        let ys = heights(n)
+        xs[0] = 1
+        ys[0] = 1
+        let data = [
+            xs,  // x-values (timestamps)
+            ys,  // y-values
+            one(n),
+        ]
+        let opts = {
+            mode: 2,
+            width: WIDTH,
+            height: HEIGHT,
+            cursor: {drag: { x: true, y: true }},
+            scales: {
+                x: {
+                    time: false,
+                    distr: 3,
+                //	auto: false,
+                //	range: [0, 500],
+                },
+                y: {
+                //	auto: false,
+                //	range: [0, 500],
+                },
+            },
+            series: [
+                {
+                    label: "n",
+                }, 
+                { 
+                    label: "h(n)",
+                    stroke: "blue", 
+                    fill: "rgba(0,0,255,0.1)", 
+                    paths: u => null, 
+                    points: {
+                        space: 0, 
+                        size: 4, 
+                    },
+                },
+            ],
+            axes: [
+                {
+                    label: "n",
+                    //labelSize: 20,
+                },
+                {
+                    label: "h(n)",
+                    //labelSize: 20,
+                },
+            ],
+            legend: {
+                show: false,
+            },
+        }
+        let uplot = new uPlot(opts, data, document.getElementById("plot"));
+    </script>
+  </body>
+</html>

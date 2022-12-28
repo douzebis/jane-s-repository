@@ -347,6 +347,26 @@ function height(n) {
     }
 }
 
+function range(n) {
+    // We aim at performing exact integer calculus
+    if (!Number.isSafeInteger(n)) throw 'param is not an integer'
+    if (n < 0) throw 'param must be nonnegative'
+    let res = new ArrayBuffer(4*n)
+    let view = new Uint32Array(res)
+    for (let i = 0; i < n; ++i) view[i] = i
+    return view
+}
+
+function one(n) {
+    // We aim at performing exact integer calculus
+    if (!Number.isSafeInteger(n)) throw 'param is not an integer'
+    if (n < 0) throw 'param must be nonnegative'
+    let res = new ArrayBuffer(n)
+    let view = new Uint8Array(res)
+    for (let i = 0; i < n; ++i) view[i] = 1
+    return view
+}
+
 function heights(n) {
     // We aim at performing exact integer calculus
     if (!Number.isSafeInteger(n)) throw 'param is not an integer'
