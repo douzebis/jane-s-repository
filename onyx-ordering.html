@@ -53,7 +53,7 @@
         // Set "network" div height
         let NETWORK = $('#network');
         let BASE = NETWORK.width();
-        let RATIO = (max_height + 1)/max_width
+        let RATIO = (max_height)/max_width
         NETWORK.css('height', BASE*RATIO);
         let CIRC_WIDTH = BASE/3.5/Math.log(max_width)
         let FONT_SIZE = 0.55*CIRC_WIDTH
