@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Janestreet onyx partial ordering</title>
+    <script
+        type="text/javascript"
+        src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js">
+    </script>
+    <script
+        type="text/javascript"
+        src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"
+    ></script>
+    <script
+        type="text/javascript"
+        src="./janestreet.js"
+    ></script>
+</head>
+<body>
+    <div
+        id="network"
+        style="position: relative; width: 100%; border: none">
+    </div>
+    <script type="text/javascript">
+
+        // Retrieve URL parameters
+        const P = new Proxy(new URLSearchParams(window.location.search), {
+            get: (searchParams, prop) => searchParams.get(prop),
+        })
+        // P.n          Count of nodes to display
+        // P.labels     ['position', 'label', 'height', 'reluctant_inv']
+        // P.arrows     ['none', 'up', 'down', 'both', 'to3']
+        N = parseInt(P.n)
+
+        // Create nodes and edges
+        // https://visjs.github.io/vis-network/docs/network/nodes.html
+        // https://visjs.github.io/vis-network/docs/network/edges.html
+
+        let max_height = 0
+        let heis = []
+        let widths = []
+        for (let n = 0; n < N; ++n) {
+            let h = Height(n)
+            heis[n] = h
+            if (h >= max_height) {
+                max_height = h + 1
+                widths[h] = 1
+            } else {
+                widths[h] += 1
+            }
+        }
+        let max_width = Math.max(...widths)
+
+        // Set "network" div height
+        let NETWORK = $('#network');
+        let BASE = NETWORK.width();
+        let RATIO = (max_height + 1)/max_width
+        NETWORK.css('height', BASE*RATIO);
+        let CIRC_WIDTH = BASE/3.5/Math.log(max_width)
+        let FONT_SIZE = 0.55*CIRC_WIDTH
+        console.log('width:', max_width, 'height:', max_height)
+        console.log('base:', BASE, '->', 2.2*BASE/max_width)
+
+        let nodes = new vis.DataSet([])
+        let edges = new vis.DataSet([])
+        for (let n = 0; n < N; ++n) {
+            nodes.add([
+                {
+                    id: n,
+                    shape: 'circle',
+                    widthConstraint: CIRC_WIDTH,
+                    color: hsl_to_col(255*n/P.n, 80., 70.),
+                    label: '' + n,
+                    font: {
+                        size: FONT_SIZE,
+                    },
+                    level: heis[n]
+                }
+            ])
+            if (n == 0) continue
+            let pred = Back(n)
+            edges.add([
+                {
+                    id: n,
+                    from: Back(n),
+                    to: n,
+                    arrows: {to: {enabled: true, scaleFactor: 0.2}},
+                    smooth: false,
+                    width: 3,
+                },
+            ])
+        }
+
+        // Create a network
+        var container = document.getElementById("network")
+        var data = {
+            nodes: nodes,
+            edges: edges,
+        }
+        var options = {
+            // https://github.com/visjs/vis-network/issues/671
+            interaction: {
+                dragNodes: P.interactive == 'yes' ? true: false,
+                dragView: P.interactive == 'yes' ? true: false,
+                keyboard: false,
+                zoomView: P.interactive == 'yes' ? true: false,
+            },
+            physics: false,
+            layout: {
+                hierarchical: {
+                    direction: 'DU'
+                },
+            },
+        }
+        var network = new vis.Network(container, data, options);
+        network.fit()
+    </script>
+</body>
+</html>
