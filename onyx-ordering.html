@@ -49,16 +49,17 @@
             }
         }
         let max_width = Math.max(...widths)
+        console.log('width:', max_width, 'height:', max_height)
+        max_width = 11*Math.log(max_width - 2)
+        console.log('RATIO', max_width, '/', max_height)
 
         // Set "network" div height
         let NETWORK = $('#network');
         let BASE = NETWORK.width();
         let RATIO = (max_height)/max_width
         NETWORK.css('height', BASE*RATIO);
-        let CIRC_WIDTH = BASE/3.5/Math.log(max_width)
+        let CIRC_WIDTH = 2.5*BASE/max_width
         let FONT_SIZE = 0.55*CIRC_WIDTH
-        console.log('width:', max_width, 'height:', max_height)
-        console.log('base:', BASE, '->', 2.2*BASE/max_width)
 
         let nodes = new vis.DataSet([])
         let edges = new vis.DataSet([])
