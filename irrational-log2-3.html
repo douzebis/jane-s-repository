@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>irrational-log2-3</title>
+    <script
+        type="text/javascript"
+        src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js">
+    </script>
+    <script
+        type="text/javascript"
+        src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"
+    ></script>
+    <script
+        type="text/javascript"
+        src="./janestreet.js"
+    ></script>
+</head>
+<body>
+    <div
+        id="network"
+        style="position: relative; width: 100%; border: none">
+    </div>
+    <script type="text/javascript">
+
+        // Retrieve URL parameters
+        const P = new Proxy(new URLSearchParams(window.location.search), {
+            get: (searchParams, prop) => searchParams.get(prop),
+        })
+        // P.n          Count of nodes to display
+        // P.labels     ['position', 'label', 'height', 'reluctant_inv']
+        // P.arrows     ['none', 'up', 'down', 'both', 'to3']
+        N = parseInt(P.n)
+
+        // Create nodes and edges
+        // https://visjs.github.io/vis-network/docs/network/nodes.html
+        // https://visjs.github.io/vis-network/docs/network/edges.html
+
+        let max_height = 0
+
+        // Set "network" div height
+        let NETWORK = $('#network');
+        let BASE = NETWORK.width();
+        let RATIO = 1
+        NETWORK.css('height', BASE*RATIO);
+
+        let nodes = new vis.DataSet([])
+        let edges = new vis.DataSet([])
+
+        // Create circle
+        let divisions = 128
+        for (let n = 0; n < divisions; ++n) {
+            nodes.add([
+                {
+                    id: "c" + n,
+                    shape: 'dot',
+                    size: 0,
+                    label: '',
+                    x: BASE/3*Math.cos(2*Math.PI*n/divisions),
+                    y: -BASE/3*Math.sin(2*Math.PI*n/divisions),
+                    fixed: {x: true, y: true},
+                }
+            ])
+        }
+        for (let n = 0; n < divisions; ++n) {
+            let nxtn = (n + 1)%divisions
+            edges.add([
+                {
+                    id: "c" + n,
+                    from: "c" + n,
+                    to: "c" + nxtn,
+                    endPointOffset: {from: -20, to: -20},
+                    color: hsl_to_col(0, 0, 40),
+                    smooth: false,
+                    width: 1,
+                },
+            ])
+        }
+        
+        // Create a few points
+        let log3 = Math.log2(3)
+        let log3label = 'log' + subscript(2) + '(3)'
+        for (let n = 0; n < N; ++n) {
+            let label = log3label
+            if (n == 0) {
+                label = '0'
+            } else if (n != 1) {
+                label = '' + n + label
+            }
+            nodes.add([
+                {
+                    id: "d" + n,
+                    shape: 'dot',
+                    size: 2,
+                    label: label,
+                    color: hsl_to_col(0, 80., 70.),
+                    x: BASE/3*Math.cos(2*Math.PI*n*log3),
+                    y: -BASE/3*Math.sin(2*Math.PI*n*log3),
+                    fixed: {x: true, y: true},
+                }
+            ])
+        }
+
+        // Create a network
+        var container = document.getElementById("network")
+        var data = {
+            nodes: nodes,
+            edges: edges,
+        }
+        var options = {
+            // https://github.com/visjs/vis-network/issues/671
+            interaction: {
+                dragNodes: P.interactive == 'yes' ? true: false,
+                dragView: P.interactive == 'yes' ? true: false,
+                keyboard: false,
+                zoomView: P.interactive == 'yes' ? true: false,
+            },
+            physics: false,
+        }
+        var network = new vis.Network(container, data, options);
+        network.fit()
+    </script>
+</body>
+</html>
