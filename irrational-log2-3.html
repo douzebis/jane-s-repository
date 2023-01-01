@@ -55,8 +55,8 @@
                     shape: 'dot',
                     size: 0,
                     label: '',
-                    x: BASE/3*Math.cos(2*Math.PI*n/divisions),
-                    y: -BASE/3*Math.sin(2*Math.PI*n/divisions),
+                    x: BASE/2*Math.cos(2*Math.PI*n/divisions),
+                    y: -BASE/2*Math.sin(2*Math.PI*n/divisions),
                     fixed: {x: true, y: true},
                 }
             ])
@@ -92,9 +92,10 @@
                     shape: 'dot',
                     size: 2,
                     label: label,
+                    font: {size: BASE/100},
                     color: hsl_to_col(0, 80., 70.),
-                    x: BASE/3*Math.cos(2*Math.PI*n*log3),
-                    y: -BASE/3*Math.sin(2*Math.PI*n*log3),
+                    x: BASE/2*Math.cos(2*Math.PI*n*log3),
+                    y: -BASE/2*Math.sin(2*Math.PI*n*log3),
                     fixed: {x: true, y: true},
                 }
             ])
