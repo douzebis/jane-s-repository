@@ -52,13 +52,13 @@ function subscript(n) {
 }
 
 // Superscript numbers
-function subscript(n) {
+function superscript(n) {
     // We aim at performing exact integer calculus
     if (!Number.isSafeInteger(n)) throw 'param is not an integer'
     if (n < 0) throw 'param must be nonnegative'
     if (n == 0) return uni_sub_0
     let res = ''
-    while (u > 0) {
+    while (n > 0) {
         let u = n%10
         res = String.fromCharCode(code_super_0 + u) + res
         n = (n - u)/10
