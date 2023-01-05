@@ -233,6 +233,26 @@ function seed(n) {
     }
 }
 
+function lambex(n) {
+    // We aim at performing exact integer calculus
+    if (!Number.isSafeInteger(n)) throw 'param is not an integer'
+    if (n < 0) throw 'param must be nonnegative'
+    let l = 0
+    while (true) {
+        switch (n%3) {
+        case 0:
+            return l
+        case 1:
+            n = 2*((n - 1)/3)
+            break
+        case 2:
+            n = 2*((n - 2)/3) + 1
+            break
+        }
+        ++l
+    }
+}
+
 function seed_n_lambex(n) {
     // We aim at performing exact integer calculus
     if (!Number.isSafeInteger(n)) throw 'param is not an integer'

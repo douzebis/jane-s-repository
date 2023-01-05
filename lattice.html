@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Network</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uplot@1.6.7/dist/uPlot.min.css">
+    <script
+        type="text/javascript"
+        src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"
+    ></script>
+    <script
+        type="text/javascript"
+        src="https://cdn.jsdelivr.net/npm/uplot@1.6.7/dist/uPlot.iife.min.js"
+    ></script>
+    <script
+        type="text/javascript"
+        src="./janestreet.js"
+    ></script>
+</head>
+<body>
+    <div id="plot" style="width: 100%"></div>
+    <script type="text/javascript">
+
+        // Set "container" and "network" div height
+        let PLOT = $('#plot')
+        let WIDTH = PLOT.width()
+        let HEIGHT = WIDTH*1
+        PLOT.css('height', HEIGHT)
+
+        // Retrieve URL parameters
+        const P = new Proxy(new URLSearchParams(window.location.search), {
+            get: (searchParams, prop) => searchParams.get(prop),
+        })
+        // N.n          Count of nodes to display
+
+        let lx = parseInt(P.l)
+        let bd = parseInt(P.b)
+        let data = [range(lx)]
+        let ser = [{label: "lambex"}]
+                
+        for (let n = 1; n < bd; ++n) {
+            reli = reluctant_inv(n)
+            nxt = reluctant_fun(reli + 1)
+            let snl = seed_n_lambex(n)
+            let s = snl[0]
+            let l = snl[1]
+            let col = "hsl(" + ((reli)%360) + ", 100%, 40%)"
+            let col2 = "hsl(" + ((reli)%360) + ", 100%, 40%)"
+            if (l < lx - 1) {
+                let ys = []
+                for (let i = 0; i < l; ++i) ys.push(null)
+                ys.push(n)
+                ys.push(up(n))
+                data.push(ys)
+                ser.push({ 
+                        label: "" + (n),
+                        stroke: up(n) == nxt ? col : col2,
+                        dash: up(n) == nxt ? false : [10, 5],
+                        width: up(n) == nxt ? 1 : 0.3,
+                        points: {
+                            space: 0, 
+                            size: 5, 
+                        },
+                })
+            }
+            let d = down(n)
+            snl = seed_n_lambex(d)
+            let sd = snl[0]
+            let ld = snl[1]
+            if (l >= lx || ld >= lx || d == 0) continue
+
+            let a, la, b, lb
+            if (l < ld) {
+                a = n
+                la = l
+                b = d
+                lb = ld
+            } else {
+                a = d
+                la = ld
+                b = n
+                lb = l
+            }
+            ys = []
+            console.log(a, la, b, lb)
+            for (let i = 0; i < la; ++i) ys.push(null)
+            loga = Math.log(a)
+            logb = Math.log(b)
+            for (let i = la; i <= lb; ++i) {
+                ys.push(Math.exp(loga+(i-la)*(logb-loga)/(lb-la)))
+            }
+            data.push(ys)
+            ser.push({ 
+                    label: "" + (n),
+                    stroke: up(n) == nxt ? col2 : col,
+                    dash: up(n) == nxt ? [10, 5] : false,
+                        width: up(n) == nxt ? 0.3 : 1,
+                    points: {
+                        space: 0, 
+                        size: 1, 
+                    },
+            
+            })
+
+
+            //let b = n
+            ////let ys = [b == 0 ? null : b]
+            ////for (let l = 1; l < lx; ++l) {
+            ////    b = up(b)
+            ////    ys.push(b)
+            ////}
+            ////data.push(ys)
+            ////ser.push({ 
+            ////        label: "" + (n),
+            ////        stroke: "hsl(" + ((n/3*53)%360) + ", 100%, 50%)", 
+            ////        //fill: "rgba(0,0,255,0.1)", 
+            ////        //paths: u => null, 
+            ////        points: {
+            ////            space: 0, 
+            ////            size: 3, 
+            ////        },
+            ////})
+            //let b2 = mu(n)
+            //let b3 = nu(n)
+            //let l2 = lambex(b2)
+            //let l3 = lambex(b3)
+            //if (l3 > l2) {
+            //    l2 = l3
+            //    b2 = b3
+            //}
+            //if (b2 != 0 && l2 < lx) {
+            //    ys = [n]
+            //    la = Math.log(n)
+            //    lb = Math.log(b2)
+            //    for (let l = 1; l <= l2; ++l) {
+            //        ys.push(Math.exp(la+l*(lb-la)/l2))
+            //    }
+            //    for (let l = l2 + 1; l <= lx; ++l) {
+            //        ys.push(null)
+            //    }
+            //    data.push(ys)
+            //    ser.push({ 
+            //            label: "" + (n),
+            //            stroke: "hsl(" + ((n/3*53)%360) + ", 100%, 50%)", 
+            //            //fill: "rgba(0,0,255,0.1)", 
+            //            //paths: u => null, 
+            //            points: {
+            //                space: 0, 
+            //                size: 1, 
+            //            },
+            //
+            //    })
+            //}
+        }
+        let opts = {
+            mode: 2,
+            width: WIDTH,
+            height: HEIGHT,
+            cursor: {drag: { x: true, y: true }},
+            scales: {
+                x: {
+                    time: false,
+                },
+                y: {
+                    distr: 3,
+                    log: 2,
+                },
+            },
+            series: ser,
+            axes: [
+                {
+                    label: "n",
+                    //labelSize: 20,
+                },
+                {
+                    label: "h(n)",
+                    //labelSize: 20,
+                },
+            ],
+            legend: {
+                show: false,
+            },
+        }
+        let uplot = new uPlot(opts, data, document.getElementById("plot"));
+    </script>
+  </body>
+</html>
